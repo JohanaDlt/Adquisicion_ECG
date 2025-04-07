@@ -1,0 +1,30 @@
+import serial
+import csv
+import time
+
+puerto = "COM3" 
+baudrate = 9600
+
+archivo_csv = "datos.csv"
+
+ser = serial.Serial(puerto, baudrate, timeout=1)
+time.sleep(2) 
+
+with open(archivo_csv, mode="w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Tiempo (s)", "Valor"])  
+
+    print("Guardando datos en 'datos.csv'... Presiona Ctrl+C para detener.")
+
+    try:
+        start_time = time.time()
+        while True:
+            line = ser.readline().decode("utf-8").strip()
+            if line:
+                elapsed_time = round(time.time() - start_time, 2)
+                writer.writerow([elapsed_time, line])
+                print(f"{elapsed_time}s: {line}")  
+    except KeyboardInterrupt:
+        print("\nDetenido por el usuario.")
+    finally:
+        ser.close()
